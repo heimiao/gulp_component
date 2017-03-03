@@ -20,7 +20,7 @@
 }
 .btn_warning{
      @include data-btn(auto,auto,#e9e335,#fff);
-    @include radius(15px);
+    @include radius(0px);
 }
 .btn_info{
     @include data-btn(auto,auto,#21a0e8);

@@ -1,3 +1,3 @@
-!(function(){
-	var a="maweichao"
-})()
+ A();
+ B();
+ console.log(2222); 
