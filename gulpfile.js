@@ -15,6 +15,7 @@ var gulp = require('gulp'), //导入gulp
 	//常用依赖库
 	glp_plumber = require('gulp-plumber'),
 	glp_rename = require('gulp-rename'),
+	glp_ngAnnotate = require('gulp-ng-annotate'),
 	//	sourcemaps = require('gulp-sourcemaps'),
 	paths = {
 		root: './',
@@ -24,7 +25,7 @@ var gulp = require('gulp'), //导入gulp
 			img: 'dist/',
 			scripts: 'dist/script',
 			fonts: 'dist/fonts',
-			html: 'dist/html'
+			html: 'dist'
 		},
 		source: {
 			root: 'src',
@@ -33,7 +34,7 @@ var gulp = require('gulp'), //导入gulp
 			img: 'src/image',
 			scripts: 'src/script',
 			fonts: 'src/fonts',
-			html: 'src/html'
+			html: 'src'
 		}
 	};
 //清除文件
@@ -43,8 +44,8 @@ gulp.task('clean', function(cb) {
 //样式生成
 gulp.task('less', function(cb) {
 	return gulp.src(paths.source.less + '/**/index_less.less')
-		.pipe(glp_less())
 		.pipe(glp_plumber())
+		.pipe(glp_less()) 
 		.pipe(gulp.dest(paths.dist.styles))
 		.pipe(glp_minicss())
 		.pipe(glp_rename({
@@ -53,11 +54,11 @@ gulp.task('less', function(cb) {
 		.pipe(gulp.dest(paths.dist.styles))
 });
 gulp.task('sass', function(cb) {
-	return gulp.src(paths.source.sass + '/**/index_sass.scss')
+	return gulp.src(paths.source.sass + '/**/*.scss')
+		.pipe(glp_plumber())
 		.pipe(glp_sass())
 		.pipe(gulp.dest(paths.dist.styles))
-		.pipe(glp_minicss())
-		.pipe(glp_plumber())
+		.pipe(glp_minicss()) 
 		.pipe(glp_rename({
 			suffix: '.min'
 		}))
@@ -65,8 +66,9 @@ gulp.task('sass', function(cb) {
 });
 //js生成
 gulp.task('js', function(cb) {
-  return gulp.src(paths.source.scripts + '/**/*.js')
-	     .pipe(glp_jshint())
+	return gulp.src(paths.source.scripts + '/**/*.js')
+		.pipe(glp_ngAnnotate())
+		.pipe(glp_jshint())
 		.pipe(glp_concat("all.js"))
 		.pipe(glp_plumber())
 		.pipe(gulp.dest(paths.dist.scripts))
@@ -74,7 +76,7 @@ gulp.task('js', function(cb) {
 		.pipe(glp_rename({
 			suffix: '.min'
 		}))
-	.pipe(gulp.dest(paths.dist.scripts))
+		.pipe(gulp.dest(paths.dist.scripts))
 });
 
 //img生成
@@ -95,20 +97,23 @@ gulp.task('html', function(cb) {
 });
 //合并生成任务
 gulp.task('build', ['clean'], function(cb) {
-	gulp.run('less', 'sass', 'img', 'js', 'fonts', 'html')
+	gulp.run('sass', 'js', 'fonts', 'html') //'img','less',
 });
 
 gulp.task('webserver', function() {
 	gulp.src('./')
 		.pipe(glp_server({
 			livereload: true,
-			port: '3003',
-			directoryListing: true,
+			port: '3030',
+			host: '192.168.169.77',
+			directoryListing: false,
+			gdefaultFile: "index.html",
 			open: true
 		}));
 });
+
 gulp.task('watch', function(cb) {
-	gulp.watch(paths.source.less + '/**/*.less', ['less']);
+	//	gulp.watch(paths.source.less + '/**/*.less', ['less']);
 	gulp.watch(paths.source.sass + '/**/*.scss', ['sass']);
 	gulp.watch(paths.source.scripts + '/**/*.js', ['js']);
 	gulp.watch(paths.source.html + '/**/*.html', ['html']);
